@@ -4,7 +4,30 @@ import numpy as np
 import requests
 import json
 import pywhatkit
+from pymongo import MongoClient
 
+# DB Connection
+
+# Cadena de conexión obtenida desde MongoDB Atlas
+uri = "mongodb+srv://efrenalvarez:T.6gqWaF!Kv!MJq@cluster0.5jyeskn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+# Crea una instancia del cliente MongoClient
+client = MongoClient(uri)
+
+# Accede a la base de datos (no editar)
+db = client.get_database('VidaVerde')
+
+# Accede a una colección dentro de la base de datos
+collection = db['datos']
+
+# Ahora puedes realizar operaciones en la colección, por ejemplo, insertar un documento
+# Editar con los resultados
+collection.insert_one({"example": "data"})
+
+# Cierra la conexión cuando hayas terminado
+client.close()
+
+# End DB Connection
 
 
 client_id = 'hkRmyxdbrq4y84fjmUOFR0UD'
