@@ -7,25 +7,33 @@ import pywhatkit
 from pymongo import MongoClient
 
 # DB Connection
+def insert_document(response, age):
+    # Cadena de conexión obtenida desde MongoDB Atlas
+    # Reemplaza <username>, <password> y <dbname> con tus propios valores
+    # También puedes necesitar cambiar el host y el puerto dependiendo de tu configuración
+    uri = "mongodb+srv://efrenalvarez:T.6gqWaF!Kv!MJq@cluster0.5jyeskn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-# Cadena de conexión obtenida desde MongoDB Atlas
-uri = "mongodb+srv://efrenalvarez:T.6gqWaF!Kv!MJq@cluster0.5jyeskn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    # Crea una instancia del cliente MongoClient
+    client = MongoClient(uri)
 
-# Crea una instancia del cliente MongoClient
-client = MongoClient(uri)
+    # Accede a la base de datos
+    db = client.get_database('VidaVerde')
 
-# Accede a la base de datos (no editar)
-db = client.get_database('VidaVerde')
+    # Accede a la colección donde deseas insertar el documento
+    collection = db['datos']
 
-# Accede a una colección dentro de la base de datos
-collection = db['datos']
+    # Crea el documento a insertar
+    document = {
+        'response': response,
+        'age': age
+    }
 
-# Ahora puedes realizar operaciones en la colección, por ejemplo, insertar un documento
-# Editar con los resultados
-collection.insert_one({"example": "data"})
+    # Inserta el documento en la colección
+    collection.insert_one(document)
 
-# Cierra la conexión cuando hayas terminado
-client.close()
+    # Cierra la conexión
+    client.close()
+
 
 # End DB Connection
 
@@ -47,6 +55,9 @@ def age_detection(img):
         for face in response['faces']:
             age = face['age']
             print(f"Estimated age: {age}")
+            insert_document(response, age)
+            # wa_messege()
+
     else:
         print("No faces detected.")
 
@@ -57,7 +68,7 @@ def wa_messege():
     
         # sending message to receiver
         # using pywhatkit
-        pywhatkit.sendwhatmsg("+5213323651326", 
+        pywhatkit.sendwhatmsg("+5213326176382", 
                                 "alerta de incendio", 
                                 1, 1)
         print("Successfully Sent!")
@@ -94,7 +105,7 @@ while True:
         cv2.imwrite(filename, frame)
         print(f"Image saved as {filename}")
         age_detection(resized_frame)
-        wa_messege()
+        # wa_messege()
     else:
         print("No person detected in the image.")
 
