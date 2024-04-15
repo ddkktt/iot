@@ -1,6 +1,5 @@
 import cv2
 import time
-import base64
 import requests
 import pywhatkit
 from pymongo import MongoClient
@@ -22,11 +21,12 @@ def insert_document(response, age):
     collection = db['datos']
 
     # Crea el documento a insertar
-    print(document)
     document = {
         'response': response,
         'age': age
     }
+    print(document)
+
 
     # Inserta el documento en la colección
     collection.insert_one(document)
