@@ -1,0 +1,2 @@
+pip install mongodb
+pip install opencv-python

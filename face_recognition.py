@@ -1,6 +1,5 @@
 import cv2
 import time
-import base64
 import requests
 import pywhatkit
 from pymongo import MongoClient
@@ -26,6 +25,8 @@ def insert_document(response, age):
         'response': response,
         'age': age
     }
+    print(document)
+
 
     print(document)
 
@@ -57,22 +58,22 @@ def age_detection(filename):
                 print("underage ")
                 message = f'there is a underage person in the kitchen '
                 # wa_messege(message)
+                send_discord_message(message)
                 insert_document(response, age)
     else:
         print("No faces detected.")
+   
+def send_discord_message(log):
+    webhook_url = 'https://discord.com/api/webhooks/1200638486273855539/Jx7HvbY_NM0hNymd_lxzOGcSGF2-Ro2EkGx2kJid2624PEuY7DqTtOS_8Z8FdZDNzv61'
+ 
+    print('here')
+    message = f"""
+    {log}
+    @here
+    """
+    
+    requests.post(webhook_url, json={'content': message})
 
-def wa_messege(message):
-    try:
-        # sending message to receiver using pywhatkit
-        current_time = time.localtime()
-        pywhatkit.sendwhatmsg("+5213323651326",
-                              message,
-                              current_time.tm_hour,
-                              current_time.tm_min + 1)
-        print("Successfully Sent!")
-    except:
-        # handling exception and printing error message
-        print("An Unexpected Error!")
 
 while True:
     ret, frame = cap.read()
