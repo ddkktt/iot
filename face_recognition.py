@@ -22,11 +22,12 @@ def insert_document(response, age):
     collection = db['datos']
 
     # Crea el documento a insertar
-    print(document)
     document = {
         'response': response,
         'age': age
     }
+
+    print(document)
 
     # Inserta el documento en la colección
     collection.insert_one(document)
@@ -47,7 +48,7 @@ def age_detection(filename):
     with open(filename, 'rb') as file:
         data = {'data': file}
         response = requests.post('https://api.everypixel.com/v1/faces', files=data, auth=(client_id, client_secret)).json()
-   
+
     if response['status'] == 'ok':
         for face in response['faces']:
             age = face['age']
@@ -55,7 +56,7 @@ def age_detection(filename):
             if(age<30):
                 print("underage ")
                 message = f'there is a underage person in the kitchen '
-                wa_messege(message)
+                # wa_messege(message)
                 insert_document(response, age)
     else:
         print("No faces detected.")
