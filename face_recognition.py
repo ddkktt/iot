@@ -3,69 +3,53 @@ import time
 import requests
 from pymongo import MongoClient
 import serial
-                                                                                        
+from datetime import datetime
+
 ser = serial.Serial('COM11', 9600)  # Replace 'COM3' with the appropriate port name
 
-
-
-
 # DB Connection
-def insert_document(response, age):
-    # Cadena de conexión obtenida desde MongoDB Atlas
-    # Reemplaza <username>, <password> y <dbname> con tus propios valores
-    # También puedes necesitar cambiar el host y el puerto dependiendo de tu configuración
+def insert_document(response, age, timestamp):
     uri = "mongodb+srv://efrenalvarez:T.6gqWaF!Kv!MJq@cluster0.5jyeskn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-
-    # Crea una instancia del cliente MongoClient
     client = MongoClient(uri)
-
-    # Accede a la base de datos
     db = client.get_database('VidaVerde')
-
-    # Accede a la colección donde deseas insertar el documento
     collection = db['datos']
-
-    # Crea el documento a insertar
     document = {
         'response': response,
-        'age': age
+        'age': age,
+        'timestamp': timestamp
     }
     print(document)
-
-
-    # Inserta el documento en la colección
     collection.insert_one(document)
-
-    # Cierra la conexión
     client.close()
 
-
 # End DB Connection
-
 client_id = 'hkRmyxdbrq4y84fjmUOFR0UD'
 client_secret = '40UggdZZNOa8E2pKvLEuEETQoXDZkjOMw0iFtwZ3Ii2a3sDs'
 net = cv2.dnn.readNetFromCaffe("deploy.prototxt", "res10_300x300_ssd_iter_140000.caffemodel")
 cap = cv2.VideoCapture(0)
 frame_count = 0
+
 def age_detection(filename):
     with open(filename, 'rb') as file:
         data = {'data': file}
         response = requests.post('https://api.everypixel.com/v1/faces', files=data, auth=(client_id, client_secret)).json()
-   
+
     if response['status'] == 'ok':
         for face in response['faces']:
             age = face['age']
             print(f"Estimated age: {age}")
-            if(age<30):
-                print("underage ")
-                message = f'hay una persona en su cocina que parece que tiene {age} anios'
-                send_discord_message(message, filename)  # Pass both message and filename
-                insert_document(response, age)
+            if age < 30:
+                print("underage")
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                message = f'hay una persona en su cocina que parece que tiene {age} años'
+                send_discord_message(message, filename)
+                insert_document(response, age, timestamp)
     else:
         print("No faces detected.")
+
 def send_discord_message(log, filename):
     webhook_url = 'https://discord.com/api/webhooks/1200638486273855539/Jx7HvbY_NM0hNymd_lxzOGcSGF2-Ro2EkGx2kJid2624PEuY7DqTtOS_8Z8FdZDNzv61'
- 
+
     print('here')
     message = f"""
     {log}
@@ -76,9 +60,9 @@ def send_discord_message(log, filename):
             files = {'file': file}
             payload = {'content': message}
             requests.post(webhook_url, data=payload, files=files)
-
     else:
         requests.post(webhook_url, message)
+
 while True:
     ret, frame = cap.read()
     resized_frame = cv2.resize(frame, (300, 300))
@@ -101,7 +85,7 @@ while True:
         line = ser.readline().decode('utf-8').rstrip()
         print(line)
         if line == '¡Humo o gas detectado!':
-            send_discord_message("¡Humo o gas detectado!", None)
-
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            send_discord_message(f"¡Humo o gas detectado! - {timestamp}", None)
+            insert_document(None, None, timestamp)
     time.sleep(2)
-    
