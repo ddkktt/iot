@@ -61,7 +61,7 @@ def send_discord_message(log, filename):
             payload = {'content': message}
             requests.post(webhook_url, data=payload, files=files)
     else:
-        requests.post(webhook_url, message)
+        requests.post(webhook_url, json={'content': message})
 
 while True:
     ret, frame = cap.read()
@@ -87,5 +87,5 @@ while True:
         if line == '¡Humo o gas detectado!':
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             send_discord_message(f"¡Humo o gas detectado! - {timestamp}", None)
-            insert_document(None, None, timestamp)
+            insert_document('fire incident', None, timestamp)
     time.sleep(2)
